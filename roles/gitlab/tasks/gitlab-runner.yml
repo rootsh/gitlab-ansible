@@ -1,0 +1,38 @@
+---
+
+- name: Add Gitlab hostanme in /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: '{{ ansible_enp0s1.ipv4.address }}     {{ gitlab_external_url }}'
+
+- name: Directory of Gitlab runner
+  ansible.builtin.file:
+    path: /opt/gitlab-runner/config
+    state: directory
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Gitab runner config
+  ansible.builtin.template:
+    src: runner-config.j2
+    dest: /opt/gitlab-runner/config/config.toml
+    owner: root
+    group: root
+    mode: '0644'
+  register: gitlab_runner_config
+
+- name: Gitlab Runner
+  docker_container:
+    name: gitlab-runner
+    image: gitlab/gitlab-runner:latest
+    state: started
+    restart: yes
+    volumes:
+      - /opt/gitlab-runner/config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/ca/ca.crt:/etc/gitlab-runner/certs/ca.crt
+
+- name: Restart Gitlab Runner
+  shell: docker container restart gitlab-runner
+  when: gitlab_runner_config.changed

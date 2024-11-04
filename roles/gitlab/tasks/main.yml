@@ -1,0 +1,13 @@
+---
+
+- name: Common
+  ansible.builtin.include_tasks: common.yml
+
+- name: Gitlab
+  ansible.builtin.include_tasks: gitlab.yml
+
+- name: Docker
+  ansible.builtin.include_tasks: docker.yml
+
+- name: Gitlab Runner
+  ansible.builtin.include_tasks: gitlab-runner.yml

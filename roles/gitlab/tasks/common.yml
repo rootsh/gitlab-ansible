@@ -1,0 +1,31 @@
+---
+
+- name: Upgrade all packages
+  ansible.builtin.package:
+    name: "*"
+    state: latest
+
+- name: Install packages
+  ansible.builtin.dnf:
+    name:
+      - policycoreutils
+      - perl
+      - postfix
+      - curl
+    state: latest
+
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+
+- name: Start Postfix
+  ansible.builtin.systemd_service:
+    name: postfix
+    state: started
+    enabled: true
+
+- name: Stop firewalld
+  ansible.builtin.systemd_service:
+    name: firewalld
+    state: stopped
+    enabled: false

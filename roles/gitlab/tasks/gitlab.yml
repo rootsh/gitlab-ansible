@@ -1,0 +1,19 @@
+---
+
+- name: Check Gitlab repo exist
+  ansible.builtin.stat:
+    path: /etc/yum.repos.d/gitlab_gitlab-{{ gitlab_type }}.repo
+  register: gitlab_repo
+
+- name: Added Gitlab repo
+  shell: curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-{{ gitlab_type }}/script.rpm.sh | sudo bash
+  when: gitlab_repo.stat.exists == False
+
+- name: Check Gitlab exist
+  ansible.builtin.stat:
+    path: /opt/gitlab/bin/gitlab-ctl
+  register: gitlab
+
+- name: Install Gitlab
+  shell: sudo EXTERNAL_URL="https://{{ gitlab_external_url }}" dnf install -y gitlab-{{ gitlab_type }}
+  when: gitlab.stat.exists == False

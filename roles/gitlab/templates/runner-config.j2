@@ -1,0 +1,11 @@
+[[runners]]
+  name = "docker"
+  url = "https://{{ gitlab_external_url }}/"
+  token = "{{ gitlab_runner_token }}"
+  executor = "docker"
+
+  [runners.docker]
+    image = "ubuntu:latest"
+
+    # Add path to your ca.crt file in the volumes list
+    volumes = ["/cache", "/opt/ca/ca.crt:/etc/gitlab-runner/certs/ca.crt:ro"]
